@@ -7,8 +7,8 @@ import java.util.Stack;
 
 
 public class JavaRestaurant {
-	
-	
+
+
 	/**
 	 * Exercise 1
 	 * In this exercise you want to simulate a restaurant waiting line.
@@ -37,7 +37,7 @@ public class JavaRestaurant {
 
 		//If initial list, the waiting line and the cash register aren't empty.
 		while (!incomingCustomers.isEmpty() || !waitingLine.isEmpty() || customerAtCashRegister!= null) {
-			
+
 			/** If cash register is available and someone is waiting in line, 
 			 * then move the next customer from waiting line to cash register.
 			 * 
@@ -49,10 +49,27 @@ public class JavaRestaurant {
 			 * If the cash register is done, accumulate the money from the order
 			 * and free the cash register.
 			 */
-			
-			// YOUR CODE
-			
-			
+			if (customerAtCashRegister == null){
+				customerAtCashRegister = waitingLine.poll();
+			}
+			while(!incomingCustomers.isEmpty() && incomingCustomers.peek().getTimeEntered() == t){
+				if(customerAtCashRegister == null){
+					customerAtCashRegister = incomingCustomers.poll();
+				}
+				else{
+					waitingLine.add(incomingCustomers.poll());
+				}
+			}
+
+			if(customerAtCashRegister != null){
+				customerAtCashRegister.setTimeToComplete(customerAtCashRegister.getTimeToComplete() - 1);
+				if (customerAtCashRegister.getTimeToComplete() == 0){
+					totalMoney += customerAtCashRegister.getBill();
+					customerAtCashRegister = null;
+				}
+			}
+
+
 			t++;
 			timer++;
 		}
@@ -60,7 +77,7 @@ public class JavaRestaurant {
 		solution[1]= timer;
 		return solution;
 	}
-	
+
 	/**
 	 * Exercise 2.A
 	 * In this exercise you want to simulate a restaurant waiting line.
@@ -73,7 +90,7 @@ public class JavaRestaurant {
 	 * Remember: you must to complete the method call patienceReducer, needed for this problem. 
 	 * See Exercice 2.B
 	 */
-	
+
 	public static int[] fastFoodWithPatience(Queue<Customer> incomingCustomers) {
 		int[] solution= new int[2];
 		int timer = 0;
@@ -93,7 +110,7 @@ public class JavaRestaurant {
 
 		//If initial list, the waiting line and the cash register aren't empty.
 		while (!incomingCustomers.isEmpty() || !waitingLine.isEmpty() || customerAtCashRegister!= null) {
-			
+
 			/** If cash register is available and someone is waiting in line, 
 			 * then move the next customer from waiting line to cash register.
 			 * 
@@ -107,15 +124,32 @@ public class JavaRestaurant {
 			 * If the cash register is done, accumulate the money from the order
 			 * and free the cash register.
 			 */
-			
-			// YOUR CODE
-			
+			if (customerAtCashRegister == null && !waitingLine.isEmpty()){
+				customerAtCashRegister = waitingLine.poll();
+			}
+			while(!incomingCustomers.isEmpty() && incomingCustomers.peek().getTimeEntered() == t){
+				waitingLine.add(incomingCustomers.poll());
+
+			}
+			if(customerAtCashRegister != null){
+				customerAtCashRegister.setTimeToComplete(customerAtCashRegister.getTimeToComplete() - 1); 
+			}
+			waitingLine = patienceReducer(waitingLine);
+
+
+
+
+			if (customerAtCashRegister.getTimeToComplete() == 0){
+				totalMoney += customerAtCashRegister.getBill();
+				customerAtCashRegister = null;
+			}
+
 			t++;
 			timer++;
 		}
 		solution[0]= totalMoney;
 		solution[1]= timer;
-	
+
 		return solution;
 	}
 
@@ -128,20 +162,24 @@ public class JavaRestaurant {
 	 * @return the waitingLine with the patience depleted and those with equal to 0 removed.
 	 */
 	private static Queue<Customer> patienceReducer(Queue<Customer> waitingLine) {
-		
-		// YOUR CODE
-		// RESTRICTION: DO NOT CREATE A NEW DATA STRUCTURE
-        
-		
-		while(!waitingLine.isEmpty()) {
-			
-			
-		} 
-		return waitingLine;
-	}
-	
+		Queue<Customer> neue = new LinkedList<>();
 
-	
+		for(Customer c : waitingLine) {
+
+			c.setPatience(c.getPatience() - 1);
+		}
+		
+		for(Customer c : waitingLine) {
+			if(c.getPatience() > 0) {
+				neue.add(c);
+			}
+		}
+
+		return neue;
+	}
+
+
+
 	/**
 	 * Exercise 3
 	 * this is a famous restaurant, usually some celebrity used to visit this restaurant.
@@ -155,39 +193,57 @@ public class JavaRestaurant {
 	 * This relation is not bidirectional.
 	 * REMEMBER: You must to solve the problem using stack, otherwise you will get no points.
 	 */
-	
+
 	public static int celebrityCustomer(int[][] KNOWSTATUS, int n)
 	{
 
 		Stack<Integer> st = new Stack<>(); 
-	        // Step 1 :Push everybody onto stack, remember that the people are 
-	        // represented by index.
- 
-	           
-		   while(st.size()>1)
-		   {
-		        // Step 2 :Pop off top 
-	            // two persons from the  
-	            // stack, discard one  
-	            // person based on return 
-	            // status of knows(A, B). 
-
-	  
-	            // Step 3 : Push the  
-	            // remained person onto stack. 
-		   }
-
-
-	  
-	        // Step 5 : Check if the last  
-	        // person is celebrity or not,
-		   // depend the result, return the index of the celebrity
-		   // otherwise return -1.
-
-	        return 0; 
+		// Step 1 :Push everybody onto stack, remember that the people are 
+		// represented by index.
 		
+		for(int i = 0; i < n; i++) {
+			st.push(n);
+		}
+		
+
+
+		while(st.size()>1)
+		{
+			// Step 2 :Pop off top 
+			// two persons from the  
+			// stack, discard one  
+			// person based on return 
+			// status of knows(A, B). 
+			
+			int p1 = st.pop();
+			int p2 = st.pop();
+			boolean r = knows(KNOWSTATUS, p1, p2);
+
+			// Step 3 : Push the  
+			// remained person onto stack. 
+			
+			if(r) {
+				st.push(p2);
+			}
+			if(!r) {
+				return p1;
+			}
+		}
+
+
+
+		// Step 5 : Check if the last  
+		// person is celebrity or not,
+		// depend the result, return the index of the celebrity
+		// otherwise return -1.
+		
+		for(int i = 0; i < n; i++) {
+		}
+
+		return 0; 
+
 	}
-	
+
 	/*
 	 * This method check if the person 'a' knows the person 'b'.
 	 * if 'a' know 'b' then return true, otherwise false.
@@ -201,13 +257,13 @@ public class JavaRestaurant {
 		else
 			return false;
 	}
-	
+
 	public static class CustomerComparator implements Comparator<Customer> {
 
 
 		@Override
 		public int compare(Customer arg0, Customer arg1) {
-			
+
 			if(arg0.getPatience() == arg1.getPatience())
 			{ 
 				if(arg0.getBill() < arg1.getBill()) return 1;
@@ -215,14 +271,14 @@ public class JavaRestaurant {
 					return -1;
 			}
 			else if (arg0.getPatience()<arg1.getPatience()) {return -1;}
-			
+
 			else 
 				return 1;
 		}
-		
-		
+
+
 	}
-	
+
 	/**
 	 * Recursive Selection Sort for an array
 	 * @param shelve - Array to be sorted
@@ -240,9 +296,9 @@ public class JavaRestaurant {
 			newLine.add(lineArr[idx]);
 		}
 		return newLine;
-		
+
 	}
-	
+
 	private	static void	selHelper(Customer[] lineArr, int tailIndex, Comparator<Customer> comp) {
 		if(tailIndex >= lineArr.length) { return; }
 		int	minIndex = tailIndex;
