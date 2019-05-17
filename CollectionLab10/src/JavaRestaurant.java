@@ -168,7 +168,7 @@ public class JavaRestaurant {
 
 			c.setPatience(c.getPatience() - 1);
 		}
-		
+
 		for(Customer c : waitingLine) {
 			if(c.getPatience() > 0) {
 				neue.add(c);
@@ -194,55 +194,45 @@ public class JavaRestaurant {
 	 * REMEMBER: You must to solve the problem using stack, otherwise you will get no points.
 	 */
 
-	public static int celebrityCustomer(int[][] KNOWSTATUS, int n)
-	{
-
-		Stack<Integer> st = new Stack<>(); 
+	public static int celebrityCustomer(int[][] KNOWSTATUS, int n){
 		// Step 1 :Push everybody onto stack, remember that the people are 
 		// represented by index.
-		
-		for(int i = 0; i < n; i++) {
-			st.push(n);
-		}
-		
 
+		// Step 2 :Pop off top 
+		// two persons from the  
+		// stack, discard one  
+		// person based on return 
+		// status of knows(A, B). 
 
-		while(st.size()>1)
-		{
-			// Step 2 :Pop off top 
-			// two persons from the  
-			// stack, discard one  
-			// person based on return 
-			// status of knows(A, B). 
-			
-			int p1 = st.pop();
-			int p2 = st.pop();
-			boolean r = knows(KNOWSTATUS, p1, p2);
-
-			// Step 3 : Push the  
-			// remained person onto stack. 
-			
-			if(r) {
-				st.push(p2);
-			}
-			if(!r) {
-				return p1;
-			}
-		}
-
-
+		// Step 3 : Push the  
+		// remained person onto stack. 
 
 		// Step 5 : Check if the last  
 		// person is celebrity or not,
 		// depend the result, return the index of the celebrity
 		// otherwise return -1.
-		
-		for(int i = 0; i < n; i++) {
+
+		Stack<Integer> st = new Stack<>();
+
+		for(int i = 0; i <= n; i++) {
+			st.push(n);
 		}
+		int p1 = st.pop();
+		int p2 = st.pop();
+		boolean r = knows(KNOWSTATUS, p1, p2);
+		if(r) {
+			st.push(p2);
+		}
+		st.push(p1);
 
-		return 0; 
-
+		for(int i = 0; i < n; i++) {
+			if(KNOWSTATUS[i][i++]==1){
+				return-1;
+			}
+		}
+		return st.peek();
 	}
+
 
 	/*
 	 * This method check if the person 'a' knows the person 'b'.
